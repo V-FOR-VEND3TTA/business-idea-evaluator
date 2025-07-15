@@ -1,0 +1,38 @@
+{% extends "evaluator/base.html" %}
+{% load static %}
+
+<title>{% block title %}Business Idea Evaluator | Step 1{% endblock title %}</title>
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h4 class="my-0">Evaluate Your Business Idea</h4>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-4">
+                    <div class="progress-bar" role="progressbar" style="width: {{ progress }}%" 
+                         aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                
+                <h5 class="mb-3">What's your business idea?</h5>
+                <p class="text-muted mb-4">Give your idea a name to get started.</p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary" disabled>
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Next <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
