@@ -99,10 +99,15 @@ class EvaluationWizard(TemplateView):
                 factor_description=factor['description']
             )
             context['factor'] = factor
+            context['evaluation'] = Evaluation.objects.get(
+                id=self.request.session.get('evaluation_id')
+            )
         
         context['step'] = step
         context['total_steps'] = len(FACTORS) + 1
         context['progress'] = int(((step-1) / context['total_steps']) * 100)
+        context['factors'] = FACTORS  # Pass all factors for reference
+        
         return context
     
     def post(self, request, *args, **kwargs):
