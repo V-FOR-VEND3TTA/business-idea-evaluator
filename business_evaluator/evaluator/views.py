@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.conf import settings
 from .models import Evaluation
 from .forms import IdeaNameForm, FactorForm
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 FACTORS = [
     {
@@ -58,6 +60,27 @@ FACTORS = [
         'description': 'Will demand remain stable or grow over time?'
     },
 ]
+
+class DashboardView(LoginRequiredMixin, ListView):
+    model = Evaluation
+    template_name = 'evaluator/dashboard.html'
+    context_object_name = 'evaluations'
+    
+    def get_queryset(self):
+        return Evaluation.objects.filter(user=self.request.user).order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_evaluations'] = self.get_queryset().count()
+        
+        # Calculate average score
+        evaluations = self.get_queryset()
+        if evaluations.exists():
+            context['average_score'] = sum(e.total_score for e in evaluations) / evaluations.count()
+        else:
+            context['average_score'] = 0
+            
+        return context
 
 class EvaluationWizard(TemplateView):
     template_name = 'evaluator/step1.html'
