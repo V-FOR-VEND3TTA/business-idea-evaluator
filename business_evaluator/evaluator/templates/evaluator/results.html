@@ -1,0 +1,139 @@
+{% load static %}
+{% extends "evaluator/base.html" %}
+<title>{% block title %}Business Idea Evaluator | Results{% endblock title %}</title>
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h4 class="my-0">Evaluation Results for "{{ evaluation.idea_name }}"</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-{{ result_class }} text-center">
+                    <h4 class="alert-heading">Score: {{ evaluation.total_score }}/100</h4>
+                    <p class="mb-0">{{ result_message }}</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <canvas id="radarChart" width="400" height="400"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Factor Breakdown</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Factor</th>
+                                        <th>Score</th>
+                                        <th>Progress</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for name, score in factors %}
+                                    <tr>
+                                        <td>{{ name }}</td>
+                                        <td>{{ score }}/10</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: {% widthratio score 10 100 %}%"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>Next Steps</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            {% if evaluation.total_score <= 50 %}
+                                <p>Consider these actions:</p>
+                                <ul>
+                                    <li>Re-evaluate your target market</li>
+                                    <li>Explore ways to increase urgency or uniqueness</li>
+                                    <li>Look for ways to reduce customer acquisition costs</li>
+                                </ul>
+                            {% elif evaluation.total_score <= 74 %}
+                                <p>Suggested improvements:</p>
+                                <ul>
+                                    <li>Identify which factors scored lowest and focus on those</li>
+                                    <li>Consider pivoting to address higher-scoring markets</li>
+                                    <li>Test different pricing models to improve that score</li>
+                                </ul>
+                            {% else %}
+                                <p>Recommended actions:</p>
+                                <ul>
+                                    <li>Create a minimum viable product to test the market</li>
+                                    <li>Develop a go-to-market strategy</li>
+                                    <li>Consider funding options to accelerate growth</li>
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-house"></i> Dashboard
+                    </a>
+                    <div>
+                        <a href="#" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-download"></i> Export PDF
+                        </a>
+                        <a href="{% url 'new_evaluation' %}" class="btn btn-primary">
+                            <i class="bi bi-lightbulb"></i> Evaluate Another Idea
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    const radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: [
+                {% for name, score in factors %}
+                    '{{ name }}'{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Scores',
+                data: [
+                    {% for name, score in factors %}
+                        {{ score }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+            }]
+        },
+        options: {
+            scales: {
+                r: {
+                    angleLines: { display: true },
+                    suggestedMin: 0,
+                    suggestedMax: 10
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
