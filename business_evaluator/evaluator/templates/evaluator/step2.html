@@ -1,0 +1,7 @@
+{% extends "evaluator/step_factor.html" %}
+
+{% block content %}
+{% with factor=factors.0 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
