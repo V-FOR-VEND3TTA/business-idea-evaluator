@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
@@ -137,8 +138,17 @@ class ResultsView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        evaluation_id = self.request.session.get('evaluation_id')
-        evaluation = Evaluation.objects.get(id=evaluation_id)
+        
+        # Get evaluation ID from session or query parameter
+        evaluation_id = self.request.session.get('evaluation_id') or self.request.GET.get('id')
+        
+        try:
+            evaluation = Evaluation.objects.get(id=evaluation_id)
+            # Verify ownership if user is authenticated
+            if self.request.user.is_authenticated and evaluation.user != self.request.user:
+                raise Evaluation.DoesNotExist
+        except Evaluation.DoesNotExist:
+            raise Http404("Evaluation not found")
         
         context['evaluation'] = evaluation
         context['factors'] = evaluation.get_factors()
