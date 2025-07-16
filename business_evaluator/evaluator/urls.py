@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import SignupView, CustomLoginView, ProfileView, EvaluationWizard, ResultsView, DashboardView, home
+from .views import SignupView, CustomLoginView, CustomPasswordChangeDoneView, CustomPasswordChangeView, ProfileView, EvaluationWizard, ResultsView, DashboardView, home
 
 urlpatterns = [
     # path('', home, name='home'),
@@ -26,5 +26,7 @@ urlpatterns = [
     path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(
         template_name='registration/password_reset_complete.html'
     ), name='password_reset_complete'),
+    path('password-change/', CustomPasswordChangeView.as_view(), name='password_change'),
+    path('password-change/done/', CustomPasswordChangeDoneView.as_view(), name='password_change_done'),
     # Add other URLs for exports, etc.
 ]
