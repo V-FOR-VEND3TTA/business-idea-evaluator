@@ -1,3 +1,4 @@
+from urllib import request
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -8,6 +9,20 @@ from .models import Evaluation
 from .forms import IdeaNameForm, FactorForm
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+
+class SignupView(CreateView):
+    form_class = UserCreationForm
+    template_name = 'registration/signup.html'
+    success_url = reverse_lazy('dashboard')  # Or your desired redirect
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        login(self.request, self.object)  # Auto-login after signup
+        return response
 
 FACTORS = [
     {
@@ -170,3 +185,6 @@ class ResultsView(TemplateView):
             context['result_class'] = "success"
         
         return context
+
+def home(request):
+    return render(request, ('evaluator/home.html'))
