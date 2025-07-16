@@ -198,5 +198,13 @@ class ResultsView(TemplateView):
         
         return context
 
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'registration/profile.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['evaluations'] = Evaluation.objects.filter(user=self.request.user)
+        return context
+
 def home(request):
     return render(request, ('evaluator/home.html'))
